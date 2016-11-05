@@ -14,6 +14,10 @@ I have read these books:
 [![Nejlépe chutná za studena](http://www.legie.info/images/kniha-small/1/12058-12363.jpg)](http://www.legie.info/kniha/12058-nejlepe-chutna-za-studena)
 [![Rudá země](http://www.legie.info/images/kniha-small/1/14977-16870.jpg)](http://www.legie.info/kniha/14977-ruda-zeme)
 
+**Martin Baláž**
+
+Vlčia Hliadka 3
+
 <!---
 ![_config.yml]({{ site.baseurl }}/images/config.png)
 --->
