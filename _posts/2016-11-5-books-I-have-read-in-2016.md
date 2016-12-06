@@ -18,6 +18,11 @@ I have read these books:
 
 Vlčia Hliadka 3
 
+
+**Henrik Brink, Joseph W. Richards, and Mark Fetherolf**
+
+[![Real-World Machine Learning](http://i.imgur.com/TZd6eie.png)](https://www.manning.com/books/real-world-machine-learning)
+
 <!---
 ![_config.yml]({{ site.baseurl }}/images/config.png)
 --->
