@@ -4,7 +4,7 @@ title: Structure of Ansible project
 ---
 
 In my projects (including [Spine Hero](https://spinehero.com)) I like to use Ansible. 
-It's a great tool for deploying your code and setup whole enviroment on server.
+It's a great tool for deploying your code and for setup of whole enviroment on server.
 With one command you can transform a plain linux server into server 
 that has installed newest nginx, gunicorn, postgresql etc. and your application
 is running on it.
@@ -73,11 +73,36 @@ ansible/
 ```
 
 ### host files
-`hosts_production, hosts_vagrant` - addresses of servers (can be IP)
+`hosts_production, hosts_vagrant` - addresses of servers (can be IP) with login information
 
-`production.yml, vagrant.yml` - desc
+`production.yml, vagrant.yml` - contain main task and variables
 
 
 ### group_vars
+This directory contains variables that are used in tasks. 
+
+`all.yml` - General variables that are same on production and also staging - like application name, server name
+
+`production/vars.yml` - Variables that are specific for the enviroment - different paths, enable/disable debug mode, ssl
+
+`production/vault.yml` - encrypted file with variables like passwords to database and etc
 
 ### roles
+Inside of `roles/` directory are placed playbooks with tasks. They are grouped together into directories 
+by purpose of task they contain.
+
+`base/` - Installation of general packages that are need to monitor and work on the server.
+
+`server/` - Every task you need to setup a web server. Installation of nginx, postgresql, memcached, etc.
+Configurations for this tools are in `templates/` directory. Templates use variables from `group_vars` directory.
+
+`web` - Tasks focused on deploying a new version of your app, running migrations and things you need 
+for achieving zero downtime.
+
+## Provisioning with one command
+
+Now, when you have all of this you can deploy your app to a new server with one command:
+```sh
+ansible-playbook -i ansible/hosts_production ansible/production.yml
+```
+_Do you have any questions? Write them in comments belove._
