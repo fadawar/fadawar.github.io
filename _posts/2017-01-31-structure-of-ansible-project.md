@@ -102,7 +102,9 @@ to achieve zero downtime.
 ## Provisioning with one command
 
 Now, when you have all of this you can deploy your app to a new server with one command:
+
 ```sh
 ansible-playbook -i ansible/hosts_production ansible/production.yml
 ```
+
 _Do you have any questions? Write them in comments belove._
