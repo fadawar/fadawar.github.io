@@ -97,7 +97,7 @@ by purpose of task they contain.
 Configurations for this tools are in `templates/` directory. Templates use variables from `group_vars` directory.
 
 `web` - Tasks focused on deploying a new version of your app, running migrations and things you need 
-for achieving zero downtime.
+to achieve zero downtime.
 
 ## Provisioning with one command
 
