@@ -5,6 +5,10 @@ title: Books I have read in 2017
 
 I have read these books:
 
+**Viktor Farcic, Álex García**
+
+[![Test-Driven Java Development ](http://i.imgur.com/rOcKRmQ.png)](https://www.goodreads.com/book/show/26333479-test-driven-java-development)
+
 **Silvester Krčméry**
 
 [![Pravdou proti moci: Príbeh muža, ktorého nezlomili](http://i.imgur.com/xc4HG6z.png)](https://www.goodreads.com/book/show/25963193-pravdou-proti-moci-pr-beh-mu-a-ktor-ho-nezlomili)
