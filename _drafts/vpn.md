@@ -6,7 +6,7 @@ title: How to split traffic on GlobalProtect VPN on Mac OS automatically right a
 Recently the company I work for started to use Palo Alto's GlobalProtect as solution for VPN.
 The solution works quite well but have 2 flaws by default that I don't like.
 First is that GlobalProtect agent (client) runs automatically after operating system turns on
-and this behaviour can't be changed in the setting. You can find solution for it on other blogs. # TODO add link
+and this behaviour can't be changed in the settings. You can find solution for it on [other blogs](http://richddean.com/post/147155656349/stopautostartglobalprotectvpn).
 
 Second flaw is that it automatically send *ALL* of my traffic through my company's VPN.
 I don't think this is beneficial for company but most importantly it goes against my privacy.
@@ -20,13 +20,13 @@ I will only focus on Mac OS but simalar steps can be taken also on other operati
 
 Traffic split with GlobalProtect
 --------------------------------
-What GlobalProtect does when it connects to VPN is that it creates new network interface
+When you connect to VPN with GlobalProtect, it creates new network interface
 and edits the routing table so all our traffic is sent through this new network interface.
 
 To solve this we need to remove a route created by GlobalProtect and then create
 few new routes for only those IP addresses which we want to be directed through our VPN.
 
-We implemented it in Python (original solution taken from Name of the Author).
+We implemented it in Python (based on this [blog post](https://www.shadabahmed.com/blog/2013/08/11/split-tunneling-vpn-routing-table)).
 Save the script as split_vpn.py to your home folder. 
 Edit the lists VPN_NETS and VPN_HOSTS based on your needs. Then you can run it everytime
 you want to split traffic.
@@ -87,9 +87,10 @@ if __name__ == '__main__':
 
 Automatic traffic split after connecting to VPN
 -----------------------------------------------
-Now when we have the script to split our traffic we want it to run automatically
+Now when we have the script to split our traffic, we want it to run automatically
 after we connect to VPN with GlobalProtect.
-As it is stated in documentation # TODO add link GlobalProtect agent can run commands
+As it is stated in [documentation](https://www.paloaltonetworks.com/documentation/80/globalprotect/globalprotect-admin-guide/globalprotect-clients/deploy-agent-settings-transparently/deploy-agent-settings-to-mac-clients/deploy-scripts-using-the-mac-plist),
+GlobalProtect agent can run commands
 before connecting, after connecting and before disconnecting.
 
 Follow these steps to run the script after GlobalProtect agent connects to VPN:
@@ -121,3 +122,6 @@ country=`curl ifconfig.co/country`
 
 osascript -e "display notification \"End. You country is $country\" with title \"VPN traffic split\""
 ```
+
+
+Now your traffic should be automatically split each time you connect to VPN with GlobalProtect. Nice!
