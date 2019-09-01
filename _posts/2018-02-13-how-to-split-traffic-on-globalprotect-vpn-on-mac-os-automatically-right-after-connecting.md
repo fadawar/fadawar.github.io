@@ -110,7 +110,8 @@ Follow these steps to run the script after GlobalProtect agent connects to VPN:
 ```
 
 5. Add this script to your home folder and save it as `post_vpn_connect.sh`
-```sh
+
+```bash
 #!/bin/bash
 osascript -e 'display notification "Start" with title "VPN traffic split"'
 
