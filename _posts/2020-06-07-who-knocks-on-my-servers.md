@@ -3,7 +3,7 @@ layout: post
 title: Who knocks on my servers?
 ---
 
-# Weird domains and IP addresses in Django‘s exceptions „Invalid HTTP_HOST header“
+**Weird domains and IP addresses in Django‘s exceptions „Invalid HTTP_HOST header“**
 
 Few months back I worked on a website for a local [city festival](https://hanusovedni.sk/en/).
 It’s one of those bigger ones with lots of guests from foreign countries and a quite a long history.
