@@ -8,4 +8,4 @@ Hi everyone! I'm software engineer from Slovakia.
 
 ### Contact me
 
-[fadawar@gmail.com](mailto:fadawar@gmail.com)
+[hi@jozo.io](mailto:hi@jozo.io)
