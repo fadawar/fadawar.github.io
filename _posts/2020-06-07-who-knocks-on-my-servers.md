@@ -5,13 +5,13 @@ title: Who knocks on my servers?
 
 **Weird domains and IP addresses in Django‘s exceptions „Invalid HTTP_HOST header“**
 
-Few months back I worked on website for a local [city festival](https://hanusovedni.sk/en/).
-It’s popular festival with lots of guests from different countries and a quite long history.
+A few months back I worked on a website for a local [city festival](https://hanusovedni.sk/en/).
+It’s a popular festival with lots of guests from different countries and a quite long history.
 I migrated the site from Wordpress to a brand new Wagtail solution.
-We have also moved from sharing hosting to a VPS.
+We have also moved from shared hosting to a VPS.
 I wanted to progress quickly with development.
-So I launched new version of website as soon as possible with just uwsgi responding to all the http traffic. 
-Soon after the luanch I started to get weird errors in Sentry:
+So I launched a new version of the website as soon as possible with just uWSGI responding to all the HTTP traffic. 
+Soon after the launch, I started to get weird errors in Sentry:
 
 ![Screenshot of error in Sentry](/images/sentry-error-invalid-http-host.png)
 
@@ -21,8 +21,8 @@ Message from the error was:
 Invalid HTTP_HOST header: 'corpse.xyz'. You may need to add 'corpse.xyz' to ALLOWED_HOSTS.
 ```
 
-Message was clear.
-There were requests coming to my server from domain which is not allowed.
+The message was clear.
+Requests were coming to my server from a domain that is not allowed.
 How it can be?
 _“Maybe someone pointed his domain to my server’s IP address by mistake?”_ was first thought in my head.
 But there were many of those requests from many different domains.
@@ -35,16 +35,16 @@ And they tried to access weird URLs like:
 /cgi-bin/hello.sh
 ```
 
-And also some of them came not from domain names but from IP addresses.
-That was even more weird.
+And also some of them came not from domain names but IP addresses.
+That was even weirder.
 
 ## You can’t trust Host header
 After some time I found the reason behind this strange behavior.
-Domains and IP addresses I saw in Sentry or in logs are from HTTP header “Host”.
+Domains and IP addresses I saw in Sentry or logs are from HTTP header “Host”.
 And _all_ HTTP headers are set by client.
-In other words you can’t trust HTTP headers.
+In other words, you can’t trust HTTP headers.
 Clients can set header to whatever value they like.
-For example this is how you can do it in Python with requests library:
+For example, this is how you can do it in Python with library [requests](https://requests.readthedocs.io):
 
 ```python
 import requests
@@ -52,11 +52,11 @@ import requests
 requests.get("http://hanusovedni.sk", headers={"Host": "corpse.xyz"})
 ```
 
-Those weird requests were coming not from humans but from robots.
-There is actually a lot of robots which scan all IP addresses that exist on the Internet
+Those weird requests were coming not from humans but robots.
+There is a lot of robots that scan all IP addresses that exist on the Internet
 and find for vulnerabilities on websites. There are two groups of such robots:
 
-1. attackers who wants to misuse vulnerabilities
+1. attackers who want to misuse vulnerabilities
 2. white-hat organizations like The Shadowserver Foundation finding and reporting vulnerabilities
 
 ## Solution
