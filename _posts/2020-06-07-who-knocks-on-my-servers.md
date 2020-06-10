@@ -15,7 +15,7 @@ Soon after the launch, I started to get weird errors in Sentry:
 
 ![Screenshot of error in Sentry](/images/sentry-error-invalid-http-host.png)
 
-Message from the error was:
+Not truncated message from the error is:
 
 ```
 Invalid HTTP_HOST header: 'corpse.xyz'. You may need to add 'corpse.xyz' to ALLOWED_HOSTS.
