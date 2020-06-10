@@ -40,7 +40,7 @@ That was even weirder.
 
 ## You can’t trust Host header
 After some time I found the reason behind this strange behavior.
-Domains and IP addresses I saw in Sentry or logs are from HTTP header “Host”.
+Domains and IP addresses I saw in Sentry or logs are from HTTP header called “Host”.
 And _all_ HTTP headers are set by client.
 In other words, you can’t trust HTTP headers.
 Clients can set header to whatever value they like.
@@ -54,10 +54,12 @@ requests.get("http://hanusovedni.sk", headers={"Host": "corpse.xyz"})
 
 Those weird requests were coming not from humans but robots.
 There is a lot of robots that scan all IP addresses that exist on the Internet
-and find for vulnerabilities on websites. There are two groups of such robots:
+and are looking for vulnerabilities on websites. There are two groups of such robots:
 
 1. attackers who want to misuse vulnerabilities
 2. white-hat organizations like The Shadowserver Foundation finding and reporting vulnerabilities
+
+Either way, you don't want your application to deal with them.
 
 ## Solution
 There is actually no real problem when you see this type of exception.
@@ -96,14 +98,14 @@ services:
 ```
 
 ## What can an attacker do with the "Host" header anyway?
-Let me introduce you to the world HTTP Host header attacks.
+Let me introduce you to the world of HTTP Host header attacks.
 Your website can be in danger only if you (or any code that you run) use the "Host" header.
 The typical example is about sending an email with a link to reset the password.
 Let's assume you build the message this way:
 
 ```python
 def build_message_for_password_reset(request):
-    token = "abc42"   # usually there will be some kind of hash
+    token = "hash42"   # usually there will be some kind of hash
     link = "http://" + request.META['HTTP_HOST'] + "/reset-password/" + token
     return f"Click on this link to reset your password: {link}"
 ```
@@ -111,7 +113,7 @@ def build_message_for_password_reset(request):
 If the attacker sends as the "Host" header his website "evil-web.com" the user will (potentially) click on this URL:
 
 ```
-http://evil-web.com/reset-password/abc42
+http://evil-web.com/reset-password/hash42
 ```
 
 At this point, the attacker can catch the token and reset the user's password and show the user whatever he wants.
