@@ -74,7 +74,7 @@ traefik.http.routers.web-router.rule=Host(`hanusovedni.sk`, `www.hanusovedni.sk`
 
 Full definition of service from `docker-compose.yml`:
 
-```
+```yaml
 services:
   web:
     image: ${WEB_IMAGE}
@@ -94,3 +94,26 @@ services:
         - "traefik.http.routers.web-router.rule=Host(`hanusovedni.sk`, `www.hanusovedni.sk`)"
         - "traefik.http.services.web.loadbalancer.server.port=8000"
 ```
+
+## What can an attacker do with the "Host" header anyway?
+Let me introduce you to the world HTTP Host header attacks.
+Your website can be in danger only if you (or any code that you run) use the "Host" header.
+The typical example is about sending an email with a link to reset the password.
+Let's assume you build the message this way:
+
+```python
+def build_message_for_password_reset(request):
+    token = "abc42"   # usually there will be some kind of hash
+    link = "http://" + request.META['HTTP_HOST'] + "/reset-password/" + token
+    return f"Click on this link to reset your password: {link}"
+```
+
+If the attacker sends as the "Host" header his website "evil-web.com" the user will (potentially) click on this URL:
+
+```
+http://evil-web.com/reset-password/abc42
+```
+
+At this point, the attacker can catch the token and reset the user's password and show the user whatever he wants.
+
+Now you understand why it's important to correctly set `ALLOWED_HOSTS` in Django's settings. ;)
