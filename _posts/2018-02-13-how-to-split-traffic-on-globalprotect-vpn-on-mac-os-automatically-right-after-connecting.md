@@ -16,7 +16,7 @@ This article describes:
 * How to split traffic based on IP addresses
 * How to do traffic splitting automatically after GlobalProtect agent connects to VPN
 
-I will only focus on Mac OS but simalar steps can be taken also on other operating systems.
+I will only focus on Mac OS but similar steps can be taken also on other operating systems.
 
 Traffic split with GlobalProtect
 --------------------------------
@@ -60,7 +60,7 @@ def main():
 
     for route in routes:
         route = route.split()
-        interface = route[5]
+        interface = route[3]
         if interface == WIRELESS_INTERFACE:
             gateway = route[1]
             break
