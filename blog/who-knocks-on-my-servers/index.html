@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html prefix="
+        og: http://ogp.me/ns# article: http://ogp.me/ns/article#
+    " vocab="http://ogp.me/ns" lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>Who knocks on my servers? | Jozo</title>
+<link href="../../assets/css/all-nocdn.css" rel="stylesheet" type="text/css">
+<meta name="theme-color" content="#5670d4">
+<meta name="generator" content="Nikola (getnikola.com)">
+<link rel="alternate" type="application/rss+xml" title="RSS" hreflang="en" href="../../rss.xml">
+<link rel="canonical" href="https://jozo.io/blog/who-knocks-on-my-servers/">
+<link rel="icon" href="../../assets/img/favicon.ico" sizes="16x16">
+<link rel="icon" href="../../assets/img/favicon-32x32.png" sizes="32x32">
+<link rel="icon" href="../../assets/img/favicon-512x512.png" sizes="512x512">
+<!--[if lt IE 9]><script src="../../assets/js/html5shiv-printshiv.min.js"></script><![endif]--><meta name="author" content="Jozo Gaborik">
+<link rel="prev" href="../how-to-split-traffic-on-globalprotect-vpn-on-mac-os/" title="How to split traffic on GlobalProtect VPN on Mac OS" type="text/html">
+<meta property="og:site_name" content="Jozo">
+<meta property="og:title" content="Who knocks on my servers?">
+<meta property="og:url" content="https://jozo.io/blog/who-knocks-on-my-servers/">
+<meta property="og:description" content="Weird domains and IP addresses in Django‘s exceptions „Invalid HTTP_HOST header“
+A few months back I worked on a website for a local city festival.
+It’s a popular festival with lots of guests from dif">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2020-06-07T16:51:40+02:00">
+<meta property="article:tag" content="django">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="security">
+</head>
+<body>
+    <a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+    <div id="container">
+          <header id="header"><div class="inner">
+        <h1 id="brand"><a href="../../" title="Jozo" rel="home">
+
+      Jozo<span>blog</span>
+  </a></h1>
+
+      
+        <nav id="menu"><ul>
+<li><a href="../../archive.html">Archive</a></li>
+          <li><a href="../../categories/">Tags</a></li>
+
+      
+      
+      
+      <li><a href="../rss.xml" title="RSS feed"><i class="fas fa-rss"></i></a></li>
+    </ul></nav>
+</div>
+  </header><main id="content"><article class="post-text h-entry hentry postpage" itemscope="itemscope" itemtype="http://schema.org/Article"><header><h1 class="p-name entry-title" itemprop="headline name"><a href="." class="u-url">Who knocks on my servers?</a></h1>
+
+    <div class="metadata">
+      <p class="byline author vcard p-author h-card"><span class="byline-name fn p-name" itemprop="author">
+                  Jozo Gaborik
+            </span></p>
+      <p class="dateline">
+        <a href="." rel="bookmark">
+          <time class="published dt-published" datetime="2020-06-07T16:51:40+02:00" itemprop="datePublished" title="2020-06-07 16:51">2020-06-07 16:51</time></a>
+      </p>
+        <p class="commentline">            <a href="#disqus_thread" data-disqus-identifier="cache/posts/2020-who-knocks-on-my-servers.html">Comments</a>
+
+
+      </p>
+<p><em>4 minutes of reading</em></p>
+      
+    </div>
+    
+  </header><div class="e-content entry-content" itemprop="articleBody text">
+      <div>
+<p><strong>Weird domains and IP addresses in Django‘s exceptions „Invalid HTTP_HOST header“</strong></p>
+<p>A few months back I worked on a website for a local <a href="https://hanusovedni.sk/en/">city festival</a>.
+It’s a popular festival with lots of guests from different countries and a quite long history.</p>
+<!-- TEASER_END -->
+
+<p>I migrated the site from Wordpress to a brand new Wagtail solution.
+We have also moved from shared hosting to a VPS.
+I wanted to progress quickly with development.
+So I launched a new version of the website as soon as possible with just uWSGI responding to all the HTTP traffic. 
+Soon after the launch, I started to get weird errors in Sentry:</p>
+<p><img alt="Screenshot of error in Sentry" src="../../images/sentry-error-invalid-http-host.png"></p>
+<p>Not truncated message from the error is:</p>
+<div class="code"><table class="codetable"><tr>
+<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
+<td class="code"><code>Invalid HTTP_HOST header: 'corpse.xyz'. You may need to add 'corpse.xyz' to ALLOWED_HOSTS.
+</code></td>
+</tr></table></div>
+
+<p>The message was clear.
+Requests were coming to my server from a domain that is not allowed.
+How it can be?
+<em>“Maybe someone pointed his domain to my server’s IP address by mistake?”</em> was first thought in my head.
+But there were many of those requests from many different domains.
+And they tried to access weird URLs like:</p>
+<div class="code"><table class="codetable">
+<tr>
+<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
+<td class="code"><code>/wp-login.php
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-2"><code data-line-number="2"></code></a></td>
+<td class="code"><code>/wp/wp-login.php
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-3"><code data-line-number="3"></code></a></td>
+<td class="code"><code>/cgi-bin/test.sh
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-4"><code data-line-number="4"></code></a></td>
+<td class="code"><code>/cgi-bin/hello.sh
+</code></td>
+</tr>
+</table></div>
+
+<p>And also some of them came not from domain names but IP addresses.
+That was even weirder.</p>
+<h3>You can’t trust Host header</h3>
+<p>After some time I found the reason behind this strange behavior.
+Domains and IP addresses I saw in Sentry or logs are from HTTP header called “Host”.
+And <em>all</em> HTTP headers are set by client.
+In other words, you can’t trust HTTP headers.
+Clients can set header to whatever value they like.
+For example, this is how you can do it in Python with library <a href="https://requests.readthedocs.io">requests</a>:</p>
+<div class="code"><table class="codetable">
+<tr>
+<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
+<td class="code"><code><span class="kn">import</span> <span class="nn">requests</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-2"><code data-line-number="2"></code></a></td>
+<td class="code"><code>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-3"><code data-line-number="3"></code></a></td>
+<td class="code"><code><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"http://hanusovedni.sk"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"Host"</span><span class="p">:</span> <span class="s2">"corpse.xyz"</span><span class="p">})</span>
+</code></td>
+</tr>
+</table></div>
+
+<p>Those weird requests were coming not from humans but robots.
+There is a lot of robots that scan all IP addresses that exist on the Internet
+and are looking for vulnerabilities on websites. There are two groups of such robots:</p>
+<ol>
+<li>attackers who want to misuse vulnerabilities</li>
+<li>white-hat organizations like The Shadowserver Foundation finding and reporting vulnerabilities</li>
+</ol>
+<p>Either way, you don't want your application to deal with them.</p>
+<h3>Solution</h3>
+<p>There is actually no real problem when you see this type of exception.
+It means Django is doing it’s job and filters malicious requests.
+But we want to filter out such requests as soon as possible.
+In most cases it means to filter it at reverse proxy.
+In my case it‘s <a href="https://traefik.io">Traefik</a>.
+You can create rules for Treafik as labels on your services in <code>docker-compose.yml</code>. 
+This rule will pass to Django only requests with Host header set to my domain.</p>
+<div class="code"><table class="codetable"><tr>
+<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
+<td class="code"><code>traefik.http.routers.web-router.rule=Host(`hanusovedni.sk`, `www.hanusovedni.sk`)
+</code></td>
+</tr></table></div>
+
+<p>Full definition of service from <code>docker-compose.yml</code>:</p>
+<div class="code"><table class="codetable">
+<tr>
+<td class="linenos linenodiv"><a href="#-1"><code data-line-number=" 1"></code></a></td>
+<td class="code"><code><span class="nt">services</span><span class="p">:</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-2"><code data-line-number=" 2"></code></a></td>
+<td class="code"><code>  <span class="nt">web</span><span class="p">:</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-3"><code data-line-number=" 3"></code></a></td>
+<td class="code"><code>    <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${WEB_IMAGE}</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-4"><code data-line-number=" 4"></code></a></td>
+<td class="code"><code>    <span class="nt">env_file</span><span class="p">:</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-5"><code data-line-number=" 5"></code></a></td>
+<td class="code"><code>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">secrets.env</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-6"><code data-line-number=" 6"></code></a></td>
+<td class="code"><code>    <span class="nt">environment</span><span class="p">:</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-7"><code data-line-number=" 7"></code></a></td>
+<td class="code"><code>      <span class="nt">DJANGO_SETTINGS_MODULE</span><span class="p">:</span> <span class="s">"hanusovedni.settings.production"</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-8"><code data-line-number=" 8"></code></a></td>
+<td class="code"><code>    <span class="nt">volumes</span><span class="p">:</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-9"><code data-line-number=" 9"></code></a></td>
+<td class="code"><code>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">/var/www/static:/static_root</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-10"><code data-line-number="10"></code></a></td>
+<td class="code"><code>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">/var/www/media:/media_root</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-11"><code data-line-number="11"></code></a></td>
+<td class="code"><code>    <span class="nt">deploy</span><span class="p">:</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-12"><code data-line-number="12"></code></a></td>
+<td class="code"><code>      <span class="nt">replicas</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-13"><code data-line-number="13"></code></a></td>
+<td class="code"><code>      <span class="nt">restart_policy</span><span class="p">:</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-14"><code data-line-number="14"></code></a></td>
+<td class="code"><code>        <span class="nt">condition</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">on-failure</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-15"><code data-line-number="15"></code></a></td>
+<td class="code"><code>      <span class="nt">labels</span><span class="p">:</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-16"><code data-line-number="16"></code></a></td>
+<td class="code"><code>        <span class="p p-Indicator">-</span> <span class="s">"traefik.enable=true"</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-17"><code data-line-number="17"></code></a></td>
+<td class="code"><code>        <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.web-router.rule=Host(`hanusovedni.sk`,</span><span class="nv"> </span><span class="s">`www.hanusovedni.sk`)"</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-18"><code data-line-number="18"></code></a></td>
+<td class="code"><code>        <span class="p p-Indicator">-</span> <span class="s">"traefik.http.services.web.loadbalancer.server.port=8000"</span>
+</code></td>
+</tr>
+</table></div>
+
+<h3>What can an attacker do with the "Host" header anyway?</h3>
+<p>Let me introduce you to the world of HTTP Host header attacks.
+Your website can be in danger only if you (or any code that you run) use the "Host" header.
+The typical example is about sending an email with a link to reset the password.
+Let's assume you build the message this way:</p>
+<div class="code"><table class="codetable">
+<tr>
+<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
+<td class="code"><code><span class="k">def</span> <span class="nf">build_message_for_password_reset</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-2"><code data-line-number="2"></code></a></td>
+<td class="code"><code>    <span class="n">token</span> <span class="o">=</span> <span class="s2">"hash42"</span>   <span class="c1"># usually there will be some kind of hash</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-3"><code data-line-number="3"></code></a></td>
+<td class="code"><code>    <span class="n">link</span> <span class="o">=</span> <span class="s2">"http://"</span> <span class="o">+</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="p">[</span><span class="s1">'HTTP_HOST'</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"/reset-password/"</span> <span class="o">+</span> <span class="n">token</span>
+</code></td>
+</tr>
+<tr>
+<td class="linenos linenodiv"><a href="#-4"><code data-line-number="4"></code></a></td>
+<td class="code"><code>    <span class="k">return</span> <span class="sa">f</span><span class="s2">"Click on this link to reset your password: </span><span class="si">{</span><span class="n">link</span><span class="si">}</span><span class="s2">"</span>
+</code></td>
+</tr>
+</table></div>
+
+<p>If the attacker sends as the "Host" header his website "evil-web.com" the user will (potentially) click on this URL:</p>
+<div class="code"><table class="codetable"><tr>
+<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
+<td class="code"><code>http://evil-web.com/reset-password/hash42
+</code></td>
+</tr></table></div>
+
+<p>At this point, the attacker can catch the token and reset the user's password and show the user whatever he wants.</p>
+<p>Now you understand why it's important to correctly set <code>ALLOWED_HOSTS</code> in Django's settings. ;)</p>
+</div>
+    </div>
+    <aside class="postpromonav"><nav><ul itemprop="keywords" class="tags">
+<li><a class="tag p-category" href="../../categories/django/" rel="tag">django</a></li>
+            <li><a class="tag p-category" href="../../categories/python/" rel="tag">python</a></li>
+            <li><a class="tag p-category" href="../../categories/security/" rel="tag">security</a></li>
+        </ul></nav></aside><section class="comments hidden-print"><h2>Comments</h2>
+                        <div id="disqus_thread"></div>
+        <script>
+        var disqus_shortname ="jozo-io",
+            disqus_url="https://jozo.io/blog/who-knocks-on-my-servers/",
+        disqus_title="Who knocks on my servers?",
+        disqus_identifier="cache/posts/2020-who-knocks-on-my-servers.html",
+        disqus_config = function () {
+            this.language = "en";
+        };
+        (function() {
+            var dsq = document.createElement('script'); dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script><noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+</noscript>
+    <a href="https://disqus.com" class="dsq-brlink" rel="nofollow">Comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+      </section></article><script>var disqus_shortname="jozo-io";(function(){var a=document.createElement("script");a.async=true;a.src="https://"+disqus_shortname+".disqus.com/count.js";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(a)}());</script></main><footer id="footer"><ul class="social">
+<li><a href="http://github.com/jozo" target="_blank" title="Github"><i class="fab fa-github-alt"></i></a></li>
+    <li><a href="http://gitlab.com/jozo" target="_blank" title="Gitlab"><i class="fab fa-gitlab"></i></a></li>
+    <li><a href="https://stackoverflow.com/users/6634060/jozo" target="_blank" title="StackOverflow"><i class="fab fa-stack-overflow"></i></a></li>
+    <li><a href="http://twitter.com/jozo_io" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a></li>
+    <li><a href="https://mastodon.technology/@jozo" target="_blank" title="Mastodon"><i class="fab fa-mastodon"></i></a></li>
+    <li>
+<a href="http://linkedin.com/in/jozo" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+    </li>
+  </ul>
+<p><small>© 2020 <a href="mailto:hi@jozo.io">Jozo Gaborik</a> - Powered by <a href="https://getnikola.com" rel="nofollow">Nikola</a> and ♥ <small></small></small></p>
+      
+    </footer>
+</div>
+          <script src="../../assets/js/all-nocdn.js"></script><script src="https://polyfill.io/v3/polyfill.js?features=Intl.RelativeTimeFormat.%7Elocale.en"></script><script src="../../assets/js/luxon.min.js"></script><script src="https://kit.fontawesome.com/8a0d4a7b33.js" crossorigin="anonymous"></script><!-- fancy dates --><script>
+    luxon.Settings.defaultLocale = "en";
+    fancydates(2, {"preset": false, "format": "yyyy-MM-dd HH:mm"});
+    </script><!-- end fancy dates --><script>
+    baguetteBox.run('div#content', {
+        ignoreClass: 'islink',
+        captions: function(element) {
+            return element.getElementsByTagName('img')[0].alt;
+    }});
+    </script>
+</body>
+</html>
