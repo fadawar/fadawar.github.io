@@ -1,3 +1,5 @@
+# Jozo.io website
+Built with [Nikola](https://getnikola.com)
+
 # Development
-install sass
-install nikola
+1. Install Nikola

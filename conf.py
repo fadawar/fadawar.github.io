@@ -619,9 +619,8 @@ ATOM_FILENAME_BASE = "feed"
 #
 # If you don't need any of these, just set to []
 REDIRECTIONS = [
-    # ("how-to-split-traffic-on-globalprotect-vpn-on-mac-os-automatically-right-after-connecting/",
-    #  "/blog/how-to-split-traffic-on-globalprotect-vpn-on-mac-os/"),
-    ("/example/", "/blog/"),
+    ("how-to-split-traffic-on-globalprotect-vpn-on-mac-os-automatically-right-after-connecting/",
+     "/blog/how-to-split-traffic-on-globalprotect-vpn-on-mac-os/"),
 ]
 
 # Presets of commands to execute to deploy. Can be anything, for
