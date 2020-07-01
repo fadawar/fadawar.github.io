@@ -55,7 +55,7 @@
       {% if not post.meta('nocomments') and site_has_comments %}
         <p class="commentline">{{ comments.comment_link(post.permalink(), post._base_path) }}
       {% endif %}
-      <p><em>{{ post.reading_time }} minutes of reading</em></p>
+      <p><em>{{ post.reading_time }} min read</em></p>
       {{ html_sourcelink() }}
       {% if post.meta('link') %}
         <p class="linkline"><a href="{{ post.meta('link') }}">{{ messages("Original site") }}</a></p>
