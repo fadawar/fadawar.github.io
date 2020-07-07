@@ -84,38 +84,13 @@ Because sometimes you want just to deploy your code not to setup whole server, r
 How to do that?</p>
 <h3>Structure of project</h3>
 <p>This is how I organize files inside the root of my project that use Ansible:</p>
-<div class="code"><table class="codetable">
-<tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
-<td class="code"><code>.
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-2"><code data-line-number="2"></code></a></td>
-<td class="code"><code>├── ansible/
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-3"><code data-line-number="3"></code></a></td>
-<td class="code"><code>├── src/
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-4"><code data-line-number="4"></code></a></td>
-<td class="code"><code>├── .ansible-vault-password.txt
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-5"><code data-line-number="5"></code></a></td>
-<td class="code"><code>├── ansible.cfg
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-6"><code data-line-number="6"></code></a></td>
-<td class="code"><code>└── README.md
-</code></td>
-</tr>
-</table></div>
+<pre class="code literal-block">.
+├── ansible/
+├── src/
+├── .ansible-vault-password.txt
+├── ansible.cfg
+└── README.md
+</pre>
 
 <p>Source code is in <code>src/</code> directory and all Ansible related files are placed inside <code>ansible/</code>.
 There are also two Ansible files in the root. First, <code>.ansible-vault-password.txt</code> store password
@@ -126,153 +101,36 @@ is config file for Ansible. In my case it mostly says to Ansible to use <code>.a
 for decrypting files.</p>
 <h3>Structure of Ansible files</h3>
 <p>Inside of <code>ansible/</code> directory looks like this:</p>
-<div class="code"><table class="codetable">
-<tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number=" 1"></code></a></td>
-<td class="code"><code>ansible/
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-2"><code data-line-number=" 2"></code></a></td>
-<td class="code"><code>├── group_vars
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-3"><code data-line-number=" 3"></code></a></td>
-<td class="code"><code>│   ├── all.yml
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-4"><code data-line-number=" 4"></code></a></td>
-<td class="code"><code>│   ├── production
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-5"><code data-line-number=" 5"></code></a></td>
-<td class="code"><code>│   │   ├── vars.yml
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-6"><code data-line-number=" 6"></code></a></td>
-<td class="code"><code>│   │   └── vault.yml
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-7"><code data-line-number=" 7"></code></a></td>
-<td class="code"><code>│   └── staging
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-8"><code data-line-number=" 8"></code></a></td>
-<td class="code"><code>│       ├── vars.yml
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-9"><code data-line-number=" 9"></code></a></td>
-<td class="code"><code>│       └── vault.yml
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-10"><code data-line-number="10"></code></a></td>
-<td class="code"><code>├── roles
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-11"><code data-line-number="11"></code></a></td>
-<td class="code"><code>│   ├── base
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-12"><code data-line-number="12"></code></a></td>
-<td class="code"><code>│   │   └── tasks
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-13"><code data-line-number="13"></code></a></td>
-<td class="code"><code>│   ├── server
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-14"><code data-line-number="14"></code></a></td>
-<td class="code"><code>│   │   ├── handlers
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-15"><code data-line-number="15"></code></a></td>
-<td class="code"><code>│   │   ├── tasks
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-16"><code data-line-number="16"></code></a></td>
-<td class="code"><code>│   │   │   ├── main.yml
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-17"><code data-line-number="17"></code></a></td>
-<td class="code"><code>│   │   │   ├── setup_db.yml
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-18"><code data-line-number="18"></code></a></td>
-<td class="code"><code>│   │   │   ├── setup_gunicorn.yml
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-19"><code data-line-number="19"></code></a></td>
-<td class="code"><code>│   │   │   └── setup_nginx.yml
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-20"><code data-line-number="20"></code></a></td>
-<td class="code"><code>│   │   └── templates
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-21"><code data-line-number="21"></code></a></td>
-<td class="code"><code>│   │       ├── gunicorn_start.j2
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-22"><code data-line-number="22"></code></a></td>
-<td class="code"><code>│   │       └── nginx_site_config.j2
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-23"><code data-line-number="23"></code></a></td>
-<td class="code"><code>│   └── web
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-24"><code data-line-number="24"></code></a></td>
-<td class="code"><code>│       ├── tasks
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-25"><code data-line-number="25"></code></a></td>
-<td class="code"><code>│       └── templates
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-26"><code data-line-number="26"></code></a></td>
-<td class="code"><code>├── hosts_production
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-27"><code data-line-number="27"></code></a></td>
-<td class="code"><code>├── hosts_vagrant
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-28"><code data-line-number="28"></code></a></td>
-<td class="code"><code>├── production.yml
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-29"><code data-line-number="29"></code></a></td>
-<td class="code"><code>└── vagrant.yml
-</code></td>
-</tr>
-</table></div>
+<pre class="code literal-block">ansible/
+├── group_vars
+│   ├── all.yml
+│   ├── production
+│   │   ├── vars.yml
+│   │   └── vault.yml
+│   └── staging
+│       ├── vars.yml
+│       └── vault.yml
+├── roles
+│   ├── base
+│   │   └── tasks
+│   ├── server
+│   │   ├── handlers
+│   │   ├── tasks
+│   │   │   ├── main.yml
+│   │   │   ├── setup_db.yml
+│   │   │   ├── setup_gunicorn.yml
+│   │   │   └── setup_nginx.yml
+│   │   └── templates
+│   │       ├── gunicorn_start.j2
+│   │       └── nginx_site_config.j2
+│   └── web
+│       ├── tasks
+│       └── templates
+├── hosts_production
+├── hosts_vagrant
+├── production.yml
+└── vagrant.yml
+</pre>
 
 <h4>host files</h4>
 <p><code>hosts_production, hosts_vagrant</code> - addresses of servers (can be IP) with login information</p>
@@ -292,11 +150,8 @@ Configurations for this tools are in <code>templates/</code> directory. Template
 to achieve zero downtime.</p>
 <h3>Provisioning with one command</h3>
 <p>Now, when you have all of this you can deploy your app to a new server with one command:</p>
-<div class="code"><table class="codetable"><tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
-<td class="code"><code>ansible-playbook -i ansible/hosts_production ansible/production.yml
-</code></td>
-</tr></table></div>
+<pre class="code literal-block">ansible-playbook -i ansible/hosts_production ansible/production.yml
+</pre>
 
 <p><em>Do you have any questions? Write them in comments belove.</em></p>
 </div>

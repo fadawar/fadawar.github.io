@@ -80,11 +80,8 @@ So I launched a new version of the website as soon as possible with just uWSGI r
 Soon after the launch, I started to get weird errors in Sentry:</p>
 <p><img alt="Screenshot of error in Sentry" src="../../images/sentry-error-invalid-http-host.png"></p>
 <p>Not truncated message from the error is:</p>
-<div class="code"><table class="codetable"><tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
-<td class="code"><code>Invalid HTTP_HOST header: 'corpse.xyz'. You may need to add 'corpse.xyz' to ALLOWED_HOSTS.
-</code></td>
-</tr></table></div>
+<pre class="code literal-block">Invalid HTTP_HOST header: 'corpse.xyz'. You may need to add 'corpse.xyz' to ALLOWED_HOSTS.
+</pre>
 
 <p>The message was clear.
 Requests were coming to my server from a domain that is not allowed.
@@ -92,28 +89,11 @@ How it can be?
 <em>“Maybe someone pointed his domain to my server’s IP address by mistake?”</em> was first thought in my head.
 But there were many of those requests from many different domains.
 And they tried to access weird URLs like:</p>
-<div class="code"><table class="codetable">
-<tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
-<td class="code"><code>/wp-login.php
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-2"><code data-line-number="2"></code></a></td>
-<td class="code"><code>/wp/wp-login.php
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-3"><code data-line-number="3"></code></a></td>
-<td class="code"><code>/cgi-bin/test.sh
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-4"><code data-line-number="4"></code></a></td>
-<td class="code"><code>/cgi-bin/hello.sh
-</code></td>
-</tr>
-</table></div>
+<pre class="code literal-block">/wp-login.php
+/wp/wp-login.php
+/cgi-bin/test.sh
+/cgi-bin/hello.sh
+</pre>
 
 <p>And also some of them came not from domain names but IP addresses.
 That was even weirder.</p>
@@ -124,23 +104,10 @@ And <em>all</em> HTTP headers are set by client.
 In other words, you can’t trust HTTP headers.
 Clients can set header to whatever value they like.
 For example, this is how you can do it in Python with library <a href="https://requests.readthedocs.io">requests</a>:</p>
-<div class="code"><table class="codetable">
-<tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
-<td class="code"><code><span class="kn">import</span> <span class="nn">requests</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-2"><code data-line-number="2"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-3"><code data-line-number="3"></code></a></td>
-<td class="code"><code><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"http://hanusovedni.sk"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"Host"</span><span class="p">:</span> <span class="s2">"corpse.xyz"</span><span class="p">})</span>
-</code></td>
-</tr>
-</table></div>
+<pre class="code literal-block"><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"http://hanusovedni.sk"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"Host"</span><span class="p">:</span> <span class="s2">"corpse.xyz"</span><span class="p">})</span>
+</pre>
 
 <p>Those weird requests were coming not from humans but robots.
 There is a lot of robots that scan all IP addresses that exist on the Internet
@@ -158,140 +125,44 @@ In most cases it means to filter it at reverse proxy.
 In my case it‘s <a href="https://traefik.io">Traefik</a>.
 You can create rules for Treafik as labels on your services in <code>docker-compose.yml</code>. 
 This rule will pass to Django only requests with Host header set to my domain.</p>
-<div class="code"><table class="codetable"><tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
-<td class="code"><code>traefik.http.routers.web-router.rule=Host(`hanusovedni.sk`, `www.hanusovedni.sk`)
-</code></td>
-</tr></table></div>
+<pre class="code literal-block">traefik.http.routers.web-router.rule=Host(`hanusovedni.sk`, `www.hanusovedni.sk`)
+</pre>
 
 <p>Full definition of service from <code>docker-compose.yml</code>:</p>
-<div class="code"><table class="codetable">
-<tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number=" 1"></code></a></td>
-<td class="code"><code><span class="nt">services</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-2"><code data-line-number=" 2"></code></a></td>
-<td class="code"><code>  <span class="nt">web</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-3"><code data-line-number=" 3"></code></a></td>
-<td class="code"><code>    <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${WEB_IMAGE}</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-4"><code data-line-number=" 4"></code></a></td>
-<td class="code"><code>    <span class="nt">env_file</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-5"><code data-line-number=" 5"></code></a></td>
-<td class="code"><code>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">secrets.env</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-6"><code data-line-number=" 6"></code></a></td>
-<td class="code"><code>    <span class="nt">environment</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-7"><code data-line-number=" 7"></code></a></td>
-<td class="code"><code>      <span class="nt">DJANGO_SETTINGS_MODULE</span><span class="p">:</span> <span class="s">"hanusovedni.settings.production"</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-8"><code data-line-number=" 8"></code></a></td>
-<td class="code"><code>    <span class="nt">volumes</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-9"><code data-line-number=" 9"></code></a></td>
-<td class="code"><code>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">/var/www/static:/static_root</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-10"><code data-line-number="10"></code></a></td>
-<td class="code"><code>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">/var/www/media:/media_root</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-11"><code data-line-number="11"></code></a></td>
-<td class="code"><code>    <span class="nt">deploy</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-12"><code data-line-number="12"></code></a></td>
-<td class="code"><code>      <span class="nt">replicas</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-13"><code data-line-number="13"></code></a></td>
-<td class="code"><code>      <span class="nt">restart_policy</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-14"><code data-line-number="14"></code></a></td>
-<td class="code"><code>        <span class="nt">condition</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">on-failure</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-15"><code data-line-number="15"></code></a></td>
-<td class="code"><code>      <span class="nt">labels</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-16"><code data-line-number="16"></code></a></td>
-<td class="code"><code>        <span class="p p-Indicator">-</span> <span class="s">"traefik.enable=true"</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-17"><code data-line-number="17"></code></a></td>
-<td class="code"><code>        <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.web-router.rule=Host(`hanusovedni.sk`,</span><span class="nv"> </span><span class="s">`www.hanusovedni.sk`)"</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-18"><code data-line-number="18"></code></a></td>
-<td class="code"><code>        <span class="p p-Indicator">-</span> <span class="s">"traefik.http.services.web.loadbalancer.server.port=8000"</span>
-</code></td>
-</tr>
-</table></div>
+<pre class="code literal-block"><span class="nt">services</span><span class="p">:</span>
+  <span class="nt">web</span><span class="p">:</span>
+    <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${WEB_IMAGE}</span>
+    <span class="nt">env_file</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">secrets.env</span>
+    <span class="nt">environment</span><span class="p">:</span>
+      <span class="nt">DJANGO_SETTINGS_MODULE</span><span class="p">:</span> <span class="s">"hanusovedni.settings.production"</span>
+    <span class="nt">volumes</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">/var/www/static:/static_root</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">/var/www/media:/media_root</span>
+    <span class="nt">deploy</span><span class="p">:</span>
+      <span class="nt">replicas</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">2</span>
+      <span class="nt">restart_policy</span><span class="p">:</span>
+        <span class="nt">condition</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">on-failure</span>
+      <span class="nt">labels</span><span class="p">:</span>
+        <span class="p p-Indicator">-</span> <span class="s">"traefik.enable=true"</span>
+        <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.web-router.rule=Host(`hanusovedni.sk`,</span><span class="nv"> </span><span class="s">`www.hanusovedni.sk`)"</span>
+        <span class="p p-Indicator">-</span> <span class="s">"traefik.http.services.web.loadbalancer.server.port=8000"</span>
+</pre>
 
 <h3>What can an attacker do with the "Host" header anyway?</h3>
 <p>Let me introduce you to the world of HTTP Host header attacks.
 Your website can be in danger only if you (or any code that you run) use the "Host" header.
 The typical example is about sending an email with a link to reset the password.
 Let's assume you build the message this way:</p>
-<div class="code"><table class="codetable">
-<tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
-<td class="code"><code><span class="k">def</span> <span class="nf">build_message_for_password_reset</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-2"><code data-line-number="2"></code></a></td>
-<td class="code"><code>    <span class="n">token</span> <span class="o">=</span> <span class="s2">"hash42"</span>   <span class="c1"># usually there will be some kind of hash</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-3"><code data-line-number="3"></code></a></td>
-<td class="code"><code>    <span class="n">link</span> <span class="o">=</span> <span class="s2">"http://"</span> <span class="o">+</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="p">[</span><span class="s1">'HTTP_HOST'</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"/reset-password/"</span> <span class="o">+</span> <span class="n">token</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-4"><code data-line-number="4"></code></a></td>
-<td class="code"><code>    <span class="k">return</span> <span class="sa">f</span><span class="s2">"Click on this link to reset your password: </span><span class="si">{</span><span class="n">link</span><span class="si">}</span><span class="s2">"</span>
-</code></td>
-</tr>
-</table></div>
+<pre class="code literal-block"><span class="k">def</span> <span class="nf">build_message_for_password_reset</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="s2">"hash42"</span>   <span class="c1"># usually there will be some kind of hash</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="s2">"http://"</span> <span class="o">+</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="p">[</span><span class="s1">'HTTP_HOST'</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"/reset-password/"</span> <span class="o">+</span> <span class="n">token</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"Click on this link to reset your password: </span><span class="si">{</span><span class="n">link</span><span class="si">}</span><span class="s2">"</span>
+</pre>
 
 <p>If the attacker sends as the "Host" header his website "evil-web.com" the user will (potentially) click on this URL:</p>
-<div class="code"><table class="codetable"><tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
-<td class="code"><code>http://evil-web.com/reset-password/hash42
-</code></td>
-</tr></table></div>
+<pre class="code literal-block">http://evil-web.com/reset-password/hash42
+</pre>
 
 <p>At this point, the attacker can catch the token and reset the user's password and show the user whatever he wants.</p>
 <p>Now you understand why it's important to correctly set <code>ALLOWED_HOSTS</code> in Django's settings. ;)</p>

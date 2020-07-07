@@ -95,258 +95,57 @@ few new routes for only those IP addresses which we want to be directed through 
 Save the script as split_vpn.py to your home folder.
 Edit the lists VPN_NETS and VPN_HOSTS based on your needs. Then you can run it everytime
 you want to split traffic.</p>
-<div class="code"><table class="codetable">
-<tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number=" 1"></code></a></td>
-<td class="code"><code><span class="ch">#!/usr/bin/env python</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-2"><code data-line-number=" 2"></code></a></td>
-<td class="code"><code><span class="kn">import</span> <span class="nn">os</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-3"><code data-line-number=" 3"></code></a></td>
-<td class="code"><code><span class="kn">import</span> <span class="nn">subprocess</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-4"><code data-line-number=" 4"></code></a></td>
-<td class="code"><code><span class="kn">import</span> <span class="nn">sys</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-5"><code data-line-number=" 5"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-6"><code data-line-number=" 6"></code></a></td>
-<td class="code"><code><span class="n">WIRELESS_INTERFACE</span> <span class="o">=</span> <span class="s1">'en0'</span>  <span class="c1"># could be different on other systems</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-7"><code data-line-number=" 7"></code></a></td>
-<td class="code"><code><span class="n">TUNNEL_INTERFACE</span> <span class="o">=</span> <span class="s1">'gpd0'</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-8"><code data-line-number=" 8"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-9"><code data-line-number=" 9"></code></a></td>
-<td class="code"><code><span class="n">VPN_NETS</span> <span class="o">=</span> <span class="p">[</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-10"><code data-line-number="10"></code></a></td>
-<td class="code"><code>    <span class="s1">'172.222'</span><span class="p">,</span>              <span class="c1"># subnets which should use VPN</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-11"><code data-line-number="11"></code></a></td>
-<td class="code"><code><span class="p">]</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-12"><code data-line-number="12"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-13"><code data-line-number="13"></code></a></td>
-<td class="code"><code><span class="n">VPN_HOSTS</span> <span class="o">=</span> <span class="p">[</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-14"><code data-line-number="14"></code></a></td>
-<td class="code"><code>    <span class="s1">'90.131.25.244'</span><span class="p">,</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-15"><code data-line-number="15"></code></a></td>
-<td class="code"><code>    <span class="s1">'90.131.25.240'</span><span class="p">,</span>        <span class="c1"># IP address which should use VPN</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-16"><code data-line-number="16"></code></a></td>
-<td class="code"><code><span class="p">]</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-17"><code data-line-number="17"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-18"><code data-line-number="18"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-19"><code data-line-number="19"></code></a></td>
-<td class="code"><code><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-20"><code data-line-number="20"></code></a></td>
-<td class="code"><code>    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getuid</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-21"><code data-line-number="21"></code></a></td>
-<td class="code"><code>        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">'Please, run this command with sudo.'</span><span class="p">)</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-22"><code data-line-number="22"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-23"><code data-line-number="23"></code></a></td>
-<td class="code"><code>    <span class="n">gateway</span> <span class="o">=</span> <span class="kc">None</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-24"><code data-line-number="24"></code></a></td>
-<td class="code"><code>    <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">((</span><span class="s1">'netstat'</span><span class="p">,</span> <span class="s1">'-nrf'</span><span class="p">,</span> <span class="s1">'inet'</span><span class="p">))</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-25"><code data-line-number="25"></code></a></td>
-<td class="code"><code>    <span class="n">routes</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">'utf-8'</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)[</span><span class="mi">3</span><span class="p">:]</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-26"><code data-line-number="26"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-27"><code data-line-number="27"></code></a></td>
-<td class="code"><code>    <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">routes</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-28"><code data-line-number="28"></code></a></td>
-<td class="code"><code>        <span class="n">route</span> <span class="o">=</span> <span class="n">route</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-29"><code data-line-number="29"></code></a></td>
-<td class="code"><code>        <span class="n">interface</span> <span class="o">=</span> <span class="n">route</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-30"><code data-line-number="30"></code></a></td>
-<td class="code"><code>        <span class="k">if</span> <span class="n">interface</span> <span class="o">==</span> <span class="n">WIRELESS_INTERFACE</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-31"><code data-line-number="31"></code></a></td>
-<td class="code"><code>            <span class="n">gateway</span> <span class="o">=</span> <span class="n">route</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-32"><code data-line-number="32"></code></a></td>
-<td class="code"><code>            <span class="k">break</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-33"><code data-line-number="33"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-34"><code data-line-number="34"></code></a></td>
-<td class="code"><code>    <span class="k">if</span> <span class="n">gateway</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-35"><code data-line-number="35"></code></a></td>
-<td class="code"><code>        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">'Unable to determine VPN default gateway.'</span><span class="p">)</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-36"><code data-line-number="36"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-37"><code data-line-number="37"></code></a></td>
-<td class="code"><code>    <span class="nb">print</span><span class="p">(</span><span class="s1">'Resetting routes with gateway '</span> <span class="o">+</span> <span class="n">gateway</span><span class="p">)</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-38"><code data-line-number="38"></code></a></td>
-<td class="code"><code>    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">'route'</span><span class="p">,</span> <span class="s1">'-n'</span><span class="p">,</span> <span class="s1">'delete'</span><span class="p">,</span> <span class="s1">'default'</span><span class="p">,</span> <span class="s1">'-ifscope'</span><span class="p">,</span> <span class="n">WIRELESS_INTERFACE</span><span class="p">))</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-39"><code data-line-number="39"></code></a></td>
-<td class="code"><code>    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">'route'</span><span class="p">,</span> <span class="s1">'-n'</span><span class="p">,</span> <span class="s1">'delete'</span><span class="p">,</span> <span class="s1">'-net'</span><span class="p">,</span> <span class="s1">'default'</span><span class="p">,</span> <span class="s1">'-iface'</span><span class="p">,</span> <span class="n">TUNNEL_INTERFACE</span><span class="p">))</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-40"><code data-line-number="40"></code></a></td>
-<td class="code"><code>    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">'route'</span><span class="p">,</span> <span class="s1">'-n'</span><span class="p">,</span> <span class="s1">'add'</span><span class="p">,</span> <span class="s1">'-net'</span><span class="p">,</span> <span class="s1">'default'</span><span class="p">,</span> <span class="n">gateway</span><span class="p">))</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-41"><code data-line-number="41"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-42"><code data-line-number="42"></code></a></td>
-<td class="code"><code>    <span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">Adding routes for addresses which should go through VPN.'</span><span class="p">)</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-43"><code data-line-number="43"></code></a></td>
-<td class="code"><code>    <span class="k">for</span> <span class="n">addr</span> <span class="ow">in</span> <span class="n">VPN_NETS</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-44"><code data-line-number="44"></code></a></td>
-<td class="code"><code>        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">'route'</span><span class="p">,</span> <span class="s1">'-n'</span><span class="p">,</span> <span class="s1">'add'</span><span class="p">,</span> <span class="s1">'-net'</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="s1">'-iface'</span><span class="p">,</span> <span class="n">TUNNEL_INTERFACE</span><span class="p">))</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-45"><code data-line-number="45"></code></a></td>
-<td class="code"><code>    <span class="k">for</span> <span class="n">addr</span> <span class="ow">in</span> <span class="n">VPN_HOSTS</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-46"><code data-line-number="46"></code></a></td>
-<td class="code"><code>        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">'route'</span><span class="p">,</span> <span class="s1">'-n'</span><span class="p">,</span> <span class="s1">'add'</span><span class="p">,</span> <span class="s1">'-host'</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="s1">'-iface'</span><span class="p">,</span> <span class="n">TUNNEL_INTERFACE</span><span class="p">))</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-47"><code data-line-number="47"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-48"><code data-line-number="48"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-49"><code data-line-number="49"></code></a></td>
-<td class="code"><code><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-50"><code data-line-number="50"></code></a></td>
-<td class="code"><code>    <span class="n">main</span><span class="p">()</span>
-</code></td>
-</tr>
-</table></div>
+<pre class="code literal-block"><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">WIRELESS_INTERFACE</span> <span class="o">=</span> <span class="s1">'en0'</span>  <span class="c1"># could be different on other systems</span>
+<span class="n">TUNNEL_INTERFACE</span> <span class="o">=</span> <span class="s1">'gpd0'</span>
+
+<span class="n">VPN_NETS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">'172.222'</span><span class="p">,</span>              <span class="c1"># subnets which should use VPN</span>
+<span class="p">]</span>
+
+<span class="n">VPN_HOSTS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">'90.131.25.244'</span><span class="p">,</span>
+    <span class="s1">'90.131.25.240'</span><span class="p">,</span>        <span class="c1"># IP address which should use VPN</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getuid</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">'Please, run this command with sudo.'</span><span class="p">)</span>
+
+    <span class="n">gateway</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">((</span><span class="s1">'netstat'</span><span class="p">,</span> <span class="s1">'-nrf'</span><span class="p">,</span> <span class="s1">'inet'</span><span class="p">))</span>
+    <span class="n">routes</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">'utf-8'</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)[</span><span class="mi">3</span><span class="p">:]</span>
+
+    <span class="k">for</span> <span class="n">route</span> <span class="ow">in</span> <span class="n">routes</span><span class="p">:</span>
+        <span class="n">route</span> <span class="o">=</span> <span class="n">route</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">interface</span> <span class="o">=</span> <span class="n">route</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">interface</span> <span class="o">==</span> <span class="n">WIRELESS_INTERFACE</span><span class="p">:</span>
+            <span class="n">gateway</span> <span class="o">=</span> <span class="n">route</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">break</span>
+
+    <span class="k">if</span> <span class="n">gateway</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">'Unable to determine VPN default gateway.'</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Resetting routes with gateway '</span> <span class="o">+</span> <span class="n">gateway</span><span class="p">)</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">'route'</span><span class="p">,</span> <span class="s1">'-n'</span><span class="p">,</span> <span class="s1">'delete'</span><span class="p">,</span> <span class="s1">'default'</span><span class="p">,</span> <span class="s1">'-ifscope'</span><span class="p">,</span> <span class="n">WIRELESS_INTERFACE</span><span class="p">))</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">'route'</span><span class="p">,</span> <span class="s1">'-n'</span><span class="p">,</span> <span class="s1">'delete'</span><span class="p">,</span> <span class="s1">'-net'</span><span class="p">,</span> <span class="s1">'default'</span><span class="p">,</span> <span class="s1">'-iface'</span><span class="p">,</span> <span class="n">TUNNEL_INTERFACE</span><span class="p">))</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">'route'</span><span class="p">,</span> <span class="s1">'-n'</span><span class="p">,</span> <span class="s1">'add'</span><span class="p">,</span> <span class="s1">'-net'</span><span class="p">,</span> <span class="s1">'default'</span><span class="p">,</span> <span class="n">gateway</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">Adding routes for addresses which should go through VPN.'</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">addr</span> <span class="ow">in</span> <span class="n">VPN_NETS</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">'route'</span><span class="p">,</span> <span class="s1">'-n'</span><span class="p">,</span> <span class="s1">'add'</span><span class="p">,</span> <span class="s1">'-net'</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="s1">'-iface'</span><span class="p">,</span> <span class="n">TUNNEL_INTERFACE</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">addr</span> <span class="ow">in</span> <span class="n">VPN_HOSTS</span><span class="p">:</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">((</span><span class="s1">'route'</span><span class="p">,</span> <span class="s1">'-n'</span><span class="p">,</span> <span class="s1">'add'</span><span class="p">,</span> <span class="s1">'-host'</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="s1">'-iface'</span><span class="p">,</span> <span class="n">TUNNEL_INTERFACE</span><span class="p">))</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre>
 
 <h3>Automatic traffic split after connecting to VPN</h3>
 <p>Now when we have the script to split our traffic, we want it to run automatically
@@ -354,105 +153,39 @@ after we connect to VPN with GlobalProtect.
 As it is stated in <a href="https://www.paloaltonetworks.com/documentation/80/globalprotect/globalprotect-admin-guide/globalprotect-clients/deploy-agent-settings-transparently/deploy-agent-settings-to-mac-clients/deploy-scripts-using-the-mac-plist">documentation</a>,
 GlobalProtect agent can run commands
 before connecting, after connecting and before disconnecting.</p>
-<p>Follow these steps to run the script after GlobalProtect agent connects to VPN:
-1. Disable and close GlobalProtect
-2. Run <code>killall cfprefsd</code>
-3. Open in editor <code>/Library/Preferences/com.paloaltonetworks.GlobalProtect.settings.plist</code>
-4. Add to the section <code>/Palo Alto Networks/GlobalProtect/Settings/</code> following <em>(edit path based on your username)</em>:</p>
-<div class="code"><table class="codetable">
-<tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
-<td class="code"><code><span class="nt">&lt;key&gt;</span>post-vpn-connect<span class="nt">&lt;/key&gt;</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-2"><code data-line-number="2"></code></a></td>
-<td class="code"><code><span class="nt">&lt;dict&gt;</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-3"><code data-line-number="3"></code></a></td>
-<td class="code"><code>        <span class="nt">&lt;key&gt;</span>command<span class="nt">&lt;/key&gt;</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-4"><code data-line-number="4"></code></a></td>
-<td class="code"><code>        <span class="nt">&lt;string&gt;</span>/Users/your_usename/post_vpn_connect.sh<span class="nt">&lt;/string&gt;</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-5"><code data-line-number="5"></code></a></td>
-<td class="code"><code>        <span class="nt">&lt;key&gt;</span>context<span class="nt">&lt;/key&gt;</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-6"><code data-line-number="6"></code></a></td>
-<td class="code"><code>        <span class="nt">&lt;string&gt;</span>admin<span class="nt">&lt;/string&gt;</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-7"><code data-line-number="7"></code></a></td>
-<td class="code"><code><span class="nt">&lt;/dict&gt;</span>
-</code></td>
-</tr>
-</table></div>
+<p>Follow these steps to run the script after GlobalProtect agent connects to VPN:</p>
+<ol>
+<li>Disable and close GlobalProtect</li>
+<li>Run <code>killall cfprefsd</code>
+</li>
+<li>Open in editor <code>/Library/Preferences/com.paloaltonetworks.GlobalProtect.settings.plist</code>
+</li>
+<li>Add to the section <code>/Palo Alto Networks/GlobalProtect/Settings/</code> following <em>(edit path based on your username)</em>:</li>
+</ol>
+<pre class="code literal-block"><span class="nt">&lt;key&gt;</span>post-vpn-connect<span class="nt">&lt;/key&gt;</span>
+<span class="nt">&lt;dict&gt;</span>
+        <span class="nt">&lt;key&gt;</span>command<span class="nt">&lt;/key&gt;</span>
+        <span class="nt">&lt;string&gt;</span>/Users/your_usename/post_vpn_connect.sh<span class="nt">&lt;/string&gt;</span>
+        <span class="nt">&lt;key&gt;</span>context<span class="nt">&lt;/key&gt;</span>
+        <span class="nt">&lt;string&gt;</span>admin<span class="nt">&lt;/string&gt;</span>
+<span class="nt">&lt;/dict&gt;</span>
+</pre>
 
 <ol>
 <li>Add this script to your home folder and save it as <code>post_vpn_connect.sh</code>
 </li>
 </ol>
-<div class="code"><table class="codetable">
-<tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number=" 1"></code></a></td>
-<td class="code"><code><span class="ch">#!/bin/bash</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-2"><code data-line-number=" 2"></code></a></td>
-<td class="code"><code>osascript -e <span class="s1">'display notification "Start" with title "VPN traffic split"'</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-3"><code data-line-number=" 3"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-4"><code data-line-number=" 4"></code></a></td>
-<td class="code"><code><span class="nv">DIR</span><span class="o">=</span><span class="s2">"</span><span class="k">$(</span> <span class="nb">cd</span> <span class="s2">"</span><span class="k">$(</span> dirname <span class="s2">"</span><span class="si">${</span><span class="nv">BASH_SOURCE</span><span class="p">[0]</span><span class="si">}</span><span class="s2">"</span> <span class="k">)</span><span class="s2">"</span> <span class="o">&amp;&amp;</span> <span class="nb">pwd</span> <span class="k">)</span><span class="s2">"</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-5"><code data-line-number=" 5"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-6"><code data-line-number=" 6"></code></a></td>
-<td class="code"><code><span class="si">${</span><span class="nv">DIR</span><span class="si">}</span>/split_vpn.py
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-7"><code data-line-number=" 7"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-8"><code data-line-number=" 8"></code></a></td>
-<td class="code"><code><span class="nv">country</span><span class="o">=</span><span class="sb">`</span>curl ifconfig.co/country<span class="sb">`</span>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-9"><code data-line-number=" 9"></code></a></td>
-<td class="code"><code>
-</code></td>
-</tr>
-<tr>
-<td class="linenos linenodiv"><a href="#-10"><code data-line-number="10"></code></a></td>
-<td class="code"><code>osascript -e <span class="s2">"display notification \"End. You country is </span><span class="nv">$country</span><span class="s2">\" with title \"VPN traffic split\""</span>
-</code></td>
-</tr>
-</table></div>
+<pre class="code literal-block"><span class="ch">#!/bin/bash</span>
+osascript -e <span class="s1">'display notification "Start" with title "VPN traffic split"'</span>
+
+<span class="nv">DIR</span><span class="o">=</span><span class="s2">"</span><span class="k">$(</span> <span class="nb">cd</span> <span class="s2">"</span><span class="k">$(</span> dirname <span class="s2">"</span><span class="si">${</span><span class="nv">BASH_SOURCE</span><span class="p">[0]</span><span class="si">}</span><span class="s2">"</span> <span class="k">)</span><span class="s2">"</span> <span class="o">&amp;&amp;</span> <span class="nb">pwd</span> <span class="k">)</span><span class="s2">"</span>
+
+<span class="si">${</span><span class="nv">DIR</span><span class="si">}</span>/split_vpn.py
+
+<span class="nv">country</span><span class="o">=</span><span class="sb">`</span>curl ifconfig.co/country<span class="sb">`</span>
+
+osascript -e <span class="s2">"display notification \"End. You country is </span><span class="nv">$country</span><span class="s2">\" with title \"VPN traffic split\""</span>
+</pre>
 
 <p>Now your traffic should be automatically split each time you connect to VPN with GlobalProtect. Nice!</p>
 </div>

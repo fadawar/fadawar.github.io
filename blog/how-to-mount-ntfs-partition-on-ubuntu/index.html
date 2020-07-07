@@ -84,11 +84,8 @@ you can see on the image (partition <code>/media/D</code>).</p>
 Parameter <code>gid</code> is - as you already suspect - for group id. You can find it with <code>id -g</code>. By default it's <code>1000</code>.
 <code>umask</code> is mask for your directories and files permission.</p>
 <p>So the final line with your looks like this:</p>
-<div class="code"><table class="codetable"><tr>
-<td class="linenos linenodiv"><a href="#-1"><code data-line-number="1"></code></a></td>
-<td class="code"><code>UUID=782B9DA75524938A /media/D        ntfs    defaults,umask=022,uid=1000,gid=1000 0
-</code></td>
-</tr></table></div>
+<pre class="code literal-block">UUID=782B9DA75524938A /media/D        ntfs    defaults,umask=022,uid=1000,gid=1000 0
+</pre>
 
 <p>Don't forget to save your file and reboot or mount your partition back with <code>sudo mount /path/to/your/partition</code>.</p>
 <p><strong>Do you have any questions? Write it down in the comments.</strong></p>
