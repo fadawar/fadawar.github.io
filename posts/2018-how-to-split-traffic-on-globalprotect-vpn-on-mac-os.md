@@ -102,6 +102,7 @@ GlobalProtect agent can run commands
 before connecting, after connecting and before disconnecting.
 
 Follow these steps to run the script after GlobalProtect agent connects to VPN:
+
 1. Disable and close GlobalProtect
 2. Run `killall cfprefsd`
 3. Open in editor `/Library/Preferences/com.paloaltonetworks.GlobalProtect.settings.plist`
