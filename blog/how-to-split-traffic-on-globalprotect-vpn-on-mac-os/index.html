@@ -20,11 +20,11 @@
 <meta property="og:site_name" content="Jozo">
 <meta property="og:title" content="How to split traffic on GlobalProtect VPN on Mac OS">
 <meta property="og:url" content="https://jozo.io/blog/how-to-split-traffic-on-globalprotect-vpn-on-mac-os/">
-<meta property="og:description" content="Recently the company I work for started to use Palo Alto's GlobalProtect as solution for VPN.
-The solution works quite well but have 2 flaws by default that I don't like.
+<meta property="og:description" content="Recently the company I work for started to use Palo Alto's GlobalProtect as a solution for VPN.
+The solution works quite well but has 2 flaws by default that I don't like.
 
 
-First is that GlobalProtect">
+First is that the GlobalPr">
 <meta property="og:type" content="article">
 <meta property="article:published_time" content="2018-02-13T12:57:59+02:00">
 <meta property="article:tag" content="mac-os">
@@ -71,29 +71,30 @@ First is that GlobalProtect">
     
   </header><div class="e-content entry-content" itemprop="articleBody text">
       <div>
-<p>Recently the company I work for started to use Palo Alto's GlobalProtect as solution for VPN.
-The solution works quite well but have 2 flaws by default that I don't like.</p>
+<p>Recently the company I work for started to use Palo Alto's GlobalProtect as a solution for VPN.
+The solution works quite well but has 2 flaws by default that I don't like.</p>
 <!-- TEASER_END -->
 
-<p>First is that GlobalProtect agent (client) runs automatically after operating system turns on
-and this behaviour can't be changed in the settings. You can find solution for it on <a href="http://richddean.com/post/147155656349/stopautostartglobalprotectvpn">other blogs</a>.</p>
-<p>Second flaw is that it automatically send <em>ALL</em> of my traffic through my company's VPN.
-I don't think this is beneficial for company but most importantly it goes against my privacy.
-There is no need for employer to know what goes on in my traffic.</p>
+<p>First is that the GlobalProtect agent (client) runs automatically after the operating system turns on
+and this behavior can't be changed in the settings. You can find a solution for it on 
+<a href="http://richddean.com/post/147155656349/stopautostartglobalprotectvpn">other blogs</a>.</p>
+<p>The second flaw is that it automatically send <em>ALL</em> of my traffic through my company's VPN.
+I don't think this is beneficial for the company but most importantly it goes against my privacy.
+There is no need for the employer to know what goes on in my traffic.</p>
 <p>This article describes:</p>
 <ul>
 <li>How to split traffic based on IP addresses</li>
-<li>How to do traffic splitting automatically after GlobalProtect agent connects to VPN</li>
+<li>How to do traffic splitting automatically after the GlobalProtect agent connects to VPN</li>
 </ul>
 <p>I will only focus on Mac OS but similar steps can be taken also on other operating systems.</p>
 <h3>Traffic split with GlobalProtect</h3>
-<p>When you connect to VPN with GlobalProtect, it creates new network interface
+<p>When you connect to VPN with GlobalProtect, it creates a new network interface
 and edits the routing table so all our traffic is sent through this new network interface.</p>
 <p>To solve this we need to remove a route created by GlobalProtect and then create
 few new routes for only those IP addresses which we want to be directed through our VPN.</p>
 <p>We implemented it in Python (based on this <a href="https://www.shadabahmed.com/blog/2013/08/11/split-tunneling-vpn-routing-table">blog post</a>).
 Save the script as split_vpn.py to your home folder.
-Edit the lists VPN_NETS and VPN_HOSTS based on your needs. Then you can run it everytime
+Edit the lists VPN_NETS and VPN_HOSTS based on your needs. Then you can run it every time
 you want to split traffic.</p>
 <pre class="code literal-block"><span class="ch">#!/usr/bin/env python</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -150,7 +151,7 @@ you want to split traffic.</p>
 <h3>Automatic traffic split after connecting to VPN</h3>
 <p>Now when we have the script to split our traffic, we want it to run automatically
 after we connect to VPN with GlobalProtect.
-As it is stated in <a href="https://www.paloaltonetworks.com/documentation/80/globalprotect/globalprotect-admin-guide/globalprotect-clients/deploy-agent-settings-transparently/deploy-agent-settings-to-mac-clients/deploy-scripts-using-the-mac-plist">documentation</a>,
+As it is stated in the <a href="https://www.paloaltonetworks.com/documentation/80/globalprotect/globalprotect-admin-guide/globalprotect-clients/deploy-agent-settings-transparently/deploy-agent-settings-to-mac-clients/deploy-scripts-using-the-mac-plist">documentation</a>,
 GlobalProtect agent can run commands
 before connecting, after connecting and before disconnecting.</p>
 <p>Follow these steps to run the script after GlobalProtect agent connects to VPN:</p>
