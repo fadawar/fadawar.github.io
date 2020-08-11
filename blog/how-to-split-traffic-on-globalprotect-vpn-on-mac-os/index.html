@@ -24,7 +24,8 @@
 The solution works quite well but has 2 flaws by default that I don't like.
 
 
-First is that the GlobalPr">
+Updated on 2020-08-11
+Firs">
 <meta property="og:type" content="article">
 <meta property="article:published_time" content="2018-02-13T12:57:59+02:00">
 <meta property="article:tag" content="mac-os">
@@ -75,6 +76,7 @@ First is that the GlobalPr">
 The solution works quite well but has 2 flaws by default that I don't like.</p>
 <!-- TEASER_END -->
 
+<p><em>Updated on 2020-08-11</em></p>
 <p>First is that the GlobalProtect agent (client) runs automatically after the operating system turns on
 and this behavior can't be changed in the settings. You can find a solution for it on 
 <a href="http://richddean.com/post/147155656349/stopautostartglobalprotectvpn">other blogs</a>.</p>
@@ -102,7 +104,7 @@ you want to split traffic.</p>
 <span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="n">WIRELESS_INTERFACE</span> <span class="o">=</span> <span class="s1">'en0'</span>  <span class="c1"># could be different on other systems</span>
-<span class="n">TUNNEL_INTERFACE</span> <span class="o">=</span> <span class="s1">'gpd0'</span>
+<span class="n">TUNNEL_INTERFACE</span> <span class="o">=</span> <span class="s1">'utun2'</span>
 
 <span class="n">VPN_NETS</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">'172.222'</span><span class="p">,</span>              <span class="c1"># subnets which should use VPN</span>
