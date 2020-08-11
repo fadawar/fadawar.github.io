@@ -12,6 +12,8 @@ The solution works quite well but has 2 flaws by default that I don't like.
 
 <!-- TEASER_END -->
 
+_Updated on 2020-08-11_
+
 First is that the GlobalProtect agent (client) runs automatically after the operating system turns on
 and this behavior can't be changed in the settings. You can find a solution for it on 
 [other blogs](http://richddean.com/post/147155656349/stopautostartglobalprotectvpn).
@@ -47,7 +49,7 @@ import subprocess
 import sys
 
 WIRELESS_INTERFACE = 'en0'	# could be different on other systems
-TUNNEL_INTERFACE = 'gpd0'
+TUNNEL_INTERFACE = 'utun2'
 
 VPN_NETS = [
     '172.222',				# subnets which should use VPN
