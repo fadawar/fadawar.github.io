@@ -86,7 +86,6 @@ Parameter <code>gid</code> is - as you already suspect - for group id. You can f
 <p>So the final line with your looks like this:</p>
 <pre class="code literal-block">UUID=782B9DA75524938A /media/D        ntfs    defaults,umask=022,uid=1000,gid=1000 0
 </pre>
-
 <p>Don't forget to save your file and reboot or mount your partition back with <code>sudo mount /path/to/your/partition</code>.</p>
 <p><strong>Do you have any questions? Write it down in the comments.</strong></p>
 </div>
@@ -125,7 +124,7 @@ Parameter <code>gid</code> is - as you already suspect - for group id. You can f
 <a href="http://linkedin.com/in/jozo" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
     </li>
   </ul>
-<p><small>© 2020 <a href="mailto:hi@jozo.io">Jozo Gaborik</a> - Powered by <a href="https://getnikola.com" rel="nofollow">Nikola</a> and ♥ <small></small></small></p>
+<p><small>© 2021 <a href="mailto:hi@jozo.io">Jozo Gaborik</a> - Powered by <a href="https://getnikola.com" rel="nofollow">Nikola</a> and ♥ <small></small></small></p>
       
     </footer>
 </div>
@@ -135,9 +134,7 @@ Parameter <code>gid</code> is - as you already suspect - for group id. You can f
     </script><!-- end fancy dates --><script>
     baguetteBox.run('div#content', {
         ignoreClass: 'islink',
-        captions: function(element) {
-            return element.getElementsByTagName('img')[0].alt;
-    }});
+        captions: function(element){var i=element.getElementsByTagName('img')[0];return i===undefined?'':i.alt;}});
     </script>
 </body>
 </html>

@@ -65,7 +65,7 @@ I focus mainly on Python, but I have experience also in frontend and dev-ops.</p
 <a href="http://linkedin.com/in/jozo" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
     </li>
   </ul>
-<p><small>© 2020 <a href="mailto:hi@jozo.io">Jozo Gaborik</a> - Powered by <a href="https://getnikola.com" rel="nofollow">Nikola</a> and ♥ <small></small></small></p>
+<p><small>© 2021 <a href="mailto:hi@jozo.io">Jozo Gaborik</a> - Powered by <a href="https://getnikola.com" rel="nofollow">Nikola</a> and ♥ <small></small></small></p>
       
     </footer>
 </div>
@@ -75,9 +75,7 @@ I focus mainly on Python, but I have experience also in frontend and dev-ops.</p
     </script><!-- end fancy dates --><script>
     baguetteBox.run('div#content', {
         ignoreClass: 'islink',
-        captions: function(element) {
-            return element.getElementsByTagName('img')[0].alt;
-    }});
+        captions: function(element){var i=element.getElementsByTagName('img')[0];return i===undefined?'':i.alt;}});
     </script>
 </body>
 </html>

@@ -82,7 +82,6 @@ Soon after the launch, I started to get weird errors in Sentry:</p>
 <p>Not truncated message from the error is:</p>
 <pre class="code literal-block">Invalid HTTP_HOST header: 'corpse.xyz'. You may need to add 'corpse.xyz' to ALLOWED_HOSTS.
 </pre>
-
 <p>The message was clear.
 Requests were coming to my server from a domain that is not allowed.
 How it can be?
@@ -94,7 +93,6 @@ And they tried to access weird URLs like:</p>
 /cgi-bin/test.sh
 /cgi-bin/hello.sh
 </pre>
-
 <p>And also some of them came not from domain names but IP addresses.
 That was even weirder.</p>
 <h3>You can’t trust Host header</h3>
@@ -108,7 +106,6 @@ For example, this is how you can do it in Python with library <a href="https://r
 
 <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"http://hanusovedni.sk"</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"Host"</span><span class="p">:</span> <span class="s2">"corpse.xyz"</span><span class="p">})</span>
 </pre>
-
 <p>Those weird requests were coming not from humans but robots.
 There is a lot of robots that scan all IP addresses that exist on the Internet
 and are looking for vulnerabilities on websites. There are two groups of such robots:</p>
@@ -127,7 +124,6 @@ You can create rules for Treafik as labels on your services in <code>docker-comp
 This rule will pass to Django only requests with Host header set to my domain.</p>
 <pre class="code literal-block">traefik.http.routers.web-router.rule=Host(`hanusovedni.sk`, `www.hanusovedni.sk`)
 </pre>
-
 <p>Full definition of service from <code>docker-compose.yml</code>:</p>
 <pre class="code literal-block"><span class="nt">services</span><span class="p">:</span>
   <span class="nt">web</span><span class="p">:</span>
@@ -148,7 +144,6 @@ This rule will pass to Django only requests with Host header set to my domain.</
         <span class="p p-Indicator">-</span> <span class="s">"traefik.http.routers.web-router.rule=Host(`hanusovedni.sk`,</span><span class="nv"> </span><span class="s">`www.hanusovedni.sk`)"</span>
         <span class="p p-Indicator">-</span> <span class="s">"traefik.http.services.web.loadbalancer.server.port=8000"</span>
 </pre>
-
 <h3>What can an attacker do with the "Host" header anyway?</h3>
 <p>Let me introduce you to the world of HTTP Host header attacks.
 Your website can be in danger only if you (or any code that you run) use the "Host" header.
@@ -159,11 +154,9 @@ Let's assume you build the message this way:</p>
     <span class="n">link</span> <span class="o">=</span> <span class="s2">"http://"</span> <span class="o">+</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="p">[</span><span class="s1">'HTTP_HOST'</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"/reset-password/"</span> <span class="o">+</span> <span class="n">token</span>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">"Click on this link to reset your password: </span><span class="si">{</span><span class="n">link</span><span class="si">}</span><span class="s2">"</span>
 </pre>
-
 <p>If the attacker sends as the "Host" header his website "evil-web.com" the user will (potentially) click on this URL:</p>
 <pre class="code literal-block">http://evil-web.com/reset-password/hash42
 </pre>
-
 <p>At this point, the attacker can catch the token and reset the user's password and show the user whatever he wants.</p>
 <p>Now you understand why it's important to correctly set <code>ALLOWED_HOSTS</code> in Django's settings. ;)</p>
 </div>
@@ -202,7 +195,7 @@ Let's assume you build the message this way:</p>
 <a href="http://linkedin.com/in/jozo" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
     </li>
   </ul>
-<p><small>© 2020 <a href="mailto:hi@jozo.io">Jozo Gaborik</a> - Powered by <a href="https://getnikola.com" rel="nofollow">Nikola</a> and ♥ <small></small></small></p>
+<p><small>© 2021 <a href="mailto:hi@jozo.io">Jozo Gaborik</a> - Powered by <a href="https://getnikola.com" rel="nofollow">Nikola</a> and ♥ <small></small></small></p>
       
     </footer>
 </div>
@@ -212,9 +205,7 @@ Let's assume you build the message this way:</p>
     </script><!-- end fancy dates --><script>
     baguetteBox.run('div#content', {
         ignoreClass: 'islink',
-        captions: function(element) {
-            return element.getElementsByTagName('img')[0].alt;
-    }});
+        captions: function(element){var i=element.getElementsByTagName('img')[0];return i===undefined?'':i.alt;}});
     </script>
 </body>
 </html>

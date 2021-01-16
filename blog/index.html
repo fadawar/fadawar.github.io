@@ -96,7 +96,7 @@ It's a great tool for deploying your code and for setup of whole enviroment on s
 <a href="http://linkedin.com/in/jozo" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
     </li>
   </ul>
-<p><small>© 2020 <a href="mailto:hi@jozo.io">Jozo Gaborik</a> - Powered by <a href="https://getnikola.com" rel="nofollow">Nikola</a> and ♥ <small></small></small></p>
+<p><small>© 2021 <a href="mailto:hi@jozo.io">Jozo Gaborik</a> - Powered by <a href="https://getnikola.com" rel="nofollow">Nikola</a> and ♥ <small></small></small></p>
       
     </footer>
 </div>
@@ -106,9 +106,7 @@ It's a great tool for deploying your code and for setup of whole enviroment on s
     </script><!-- end fancy dates --><script>
     baguetteBox.run('div#content', {
         ignoreClass: 'islink',
-        captions: function(element) {
-            return element.getElementsByTagName('img')[0].alt;
-    }});
+        captions: function(element){var i=element.getElementsByTagName('img')[0];return i===undefined?'':i.alt;}});
     </script>
 </body>
 </html>
